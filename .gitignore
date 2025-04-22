@@ -1,2 +1,5 @@
 *.pyc
 *.pyc
+*.pyc
+__pycache__/bisection.cpython-313.pyc
+__pycache__/equation_utils.cpython-313.pyc

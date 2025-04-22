@@ -15,13 +15,13 @@ def run_solver():
         f = build_function(eq)
         a, b, tol = float(a_val), float(b_val), float(tol_val)
 
-        data, root = bisection_method(f, a, b, tol)
+        data, root_val = bisection_method(f, a, b, tol)
         plot_function(f, a, b)
 
         export_to_csv(data)
         export_to_pdf(data)
 
-        messagebox.showinfo("Success", f"Root ≈ {root:.5f}\nGraph and results saved in /results.")
+        messagebox.showinfo("Success", f"Root ≈ {root_val:.5f}\nGraph and results saved in /results.")
         img = tk.PhotoImage(file="function_plot.png")
         lbl_img.config(image=img)
         lbl_img.image = img
@@ -31,39 +31,45 @@ def run_solver():
 
 # ===== GUI SETUP =====
 root = tk.Tk()
-root.title("Bisection Method Solver")
-root.geometry("700x500")
-root.configure(bg="#F0F4FA")
+root.title("📈 Bisection Method Calculator")
+root.geometry("800x600")
+root.configure(bg="#E8EDF3")
 
-frame = tk.Frame(root, bg="#F0F4FA", padx=20, pady=20)
-frame.pack(pady=20)
+# ===== Style Setup =====
+style = ttk.Style()
+style.configure("TLabel", font=("Segoe UI", 11))
+style.configure("TButton", font=("Segoe UI", 11), padding=6)
+style.configure("TEntry", padding=4)
 
-tk.Label(frame, text="Enter f(x):", bg="#F0F4FA").grid(row=0, column=0, sticky="e")
-entry_eq = ttk.Entry(frame, width=40)
-entry_eq.grid(row=0, column=1, pady=5)
-entry_eq.insert(0, "x^3 - x - 2")
+# ===== Header =====
+header = tk.Label(root, text="Bisection Method Solver", font=("Segoe UI", 18, "bold"), bg="#E8EDF3", fg="#2C3E50")
+header.pack(pady=20)
 
-tk.Label(frame, text="Lower bound (a):", bg="#F0F4FA").grid(row=1, column=0, sticky="e")
-entry_a = ttk.Entry(frame)
-entry_a.grid(row=1, column=1, pady=5)
-entry_a.insert(0, "1")
+# ===== Input Frame =====
+frame = ttk.Frame(root, padding=20)
+frame.pack(pady=10)
 
-tk.Label(frame, text="Upper bound (b):", bg="#F0F4FA").grid(row=2, column=0, sticky="e")
-entry_b = ttk.Entry(frame)
-entry_b.grid(row=2, column=1, pady=5)
-entry_b.insert(0, "2")
+def add_labeled_entry(parent, text, row, default_val=""):
+    ttk.Label(parent, text=text).grid(row=row, column=0, sticky="e", pady=5, padx=10)
+    entry = ttk.Entry(parent, width=40)
+    entry.grid(row=row, column=1, pady=5, padx=10)
+    entry.insert(0, default_val)
+    return entry
 
-tk.Label(frame, text="Tolerance:", bg="#F0F4FA").grid(row=3, column=0, sticky="e")
-entry_tol = ttk.Entry(frame)
-entry_tol.grid(row=3, column=1, pady=5)
-entry_tol.insert(0, "0.01")
+entry_eq = add_labeled_entry(frame, "Enter f(x):", 0, "x^3 - x - 2")
+entry_a = add_labeled_entry(frame, "Lower bound (a):", 1, "1")
+entry_b = add_labeled_entry(frame, "Upper bound (b):", 2, "2")
+entry_tol = add_labeled_entry(frame, "Tolerance:", 3, "0.01")
 
-btn_solve = ttk.Button(frame, text="Solve", command=run_solver)
+# ===== Solve Button =====
+btn_solve = ttk.Button(frame, text="🔍 Solve", command=run_solver)
 btn_solve.grid(row=4, column=0, columnspan=2, pady=15)
 
-lbl_img = tk.Label(root, bg="#F0F4FA")
-lbl_img.pack()
+# ===== Image Label =====
+lbl_img = tk.Label(root, bg="#E8EDF3", bd=2, relief="groove")
+lbl_img.pack(pady=10)
 
+# ===== Ensure 'results' folder exists =====
 if not os.path.exists("results"):
     os.makedirs("results")
 
