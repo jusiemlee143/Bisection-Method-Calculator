@@ -7,16 +7,25 @@ def build_function(eq_str):
     return lambda x: eval(eq_str, {"x": x, "math": math, "__builtins__": None})
 
 def plot_function(f, a, b, filename='function_plot.png'):
+    # Generate x values from a to b
     x_vals = [a + i * (b - a) / 1000 for i in range(1001)]
     y_vals = [f(x) for x in x_vals]
-    plt.figure(figsize=(6, 4))
+
+    # Debugging: Print sample f(x) values
+    print("Sample f(x) values:", [(x, f(x)) for x in x_vals[::200]])
+
+    # Plotting function
+    plt.figure(figsize=(10, 5))  # Increase figure width
     plt.axhline(0, color='gray', linestyle='--')
-    plt.plot(x_vals, y_vals)
+    plt.plot(x_vals, y_vals, label='f(x)', color='blue')
     plt.title("Function Graph")
     plt.xlabel("x")
     plt.ylabel("f(x)")
     plt.grid(True)
-    plt.savefig(filename)
+    plt.tight_layout()  # Avoid clipping
+
+    # Save plot with tight bounding box to avoid cutting off
+    plt.savefig(filename, bbox_inches='tight')
     plt.close()
 
 def bisection_method(f, a, b, tol=0.01):
