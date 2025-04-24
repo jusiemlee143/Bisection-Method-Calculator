@@ -67,7 +67,34 @@ def export_to_pdf(data, path='results/bisection_results.pdf'):
     pdf.output(path)
 
 # === GUI LOGIC ===
+
+# --- Added: store original image globally for resizing ---
+original_img = None
+
+def resize_and_display_image():  # --- Added: function to dynamically resize and show image ---
+    if original_img is None:
+        return
+    canvas_width = canvas.winfo_width()
+    canvas_height = canvas.winfo_height()
+
+    if canvas_width < 10 or canvas_height < 10:
+        return
+
+    try:
+        resample = Image.Resampling.LANCZOS
+    except AttributeError:
+        resample = Image.ANTIALIAS
+
+    resized_img = original_img.resize((canvas_width, canvas_height), resample)
+    photo = ImageTk.PhotoImage(resized_img)
+
+    canvas.delete("all")
+    canvas.create_image(0, 0, anchor="nw", image=photo)
+    canvas.image = photo
+    canvas.config(scrollregion=canvas.bbox("all"))
+
 def run_solver():
+    global original_img  # --- Added: so we can use it in resize function
     user_eq = entry_eq.get()
     a_val = entry_a.get()
     b_val = entry_b.get()
@@ -107,6 +134,10 @@ def run_solver():
 
         # Update scroll region to match the image's size
         canvas.config(scrollregion=canvas.bbox("all"))
+
+        # --- Added: Store original image for dynamic resizing ---
+        original_img = Image.open("function_plot.png")
+        resize_and_display_image()
 
     except Exception as e:
         Messagebox.show_error(str(e), title="Error")
@@ -170,6 +201,9 @@ v_scroll = ttk.Scrollbar(canvas_frame, orient="vertical", command=canvas.yview)
 v_scroll.pack(side="right", fill="y")
 
 canvas.configure(xscrollcommand=h_scroll.set, yscrollcommand=v_scroll.set)
+
+# --- Added: Trigger resize image when canvas is resized ---
+canvas.bind("<Configure>", lambda e: resize_and_display_image())
 
 # Ensure the 'results' folder exists
 if not os.path.exists("results"):
